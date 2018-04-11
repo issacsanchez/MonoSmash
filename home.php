@@ -54,6 +54,9 @@ if (!TESTLOGIN::isLoggedIn()) {
       </nav>
     </div>
     <div class="feed" id="feed">
+    <div class="grid" id="grid" data-masonry='{ "itemSelector": ".grid-item"}'>
+    
+    </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
@@ -64,11 +67,31 @@ if (!TESTLOGIN::isLoggedIn()) {
      $(document).ready(function () {
         $.ajax({
           type: "GET",
-          dataType: "html",
+          dataType: "json",
           url: "./facebook/ajax/facebook_feed_GET.php",
           success: function (data) {
-            $("#feed").append(data);
-            console.log(data);
+            var predata = '<div class="grid-item">';
+            var postdata = '</div>';
+            var sorted_data = data.sort(function(a,b) {
+              return new Date(b.created_time.date) - new Date(a.created_time.date);
+            });
+            sorted_data.forEach(function(element) {
+              element.html = predata + element.html + postdata
+            })
+            var fb_script = document.createElement("script");
+            fb_script.innerHTML = '(function (d, s, id) {var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) return;js = d.createElement(s);js.id = id;js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.11";fjs.parentNode.insertBefore(js, fjs);}(document, "script", "facebook-jssdk"));';
+            document.head.appendChild(fb_script);
+            $.each(sorted_data, function(key,val) {
+              $("#grid").append(val.html);
+            })
+            var msnry_script = document.createElement("script");
+            msnry_script.setAttribute('src','https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js');
+            document.body.appendChild(msnry_script);
+            sorted_data.forEach(function(a) {
+              console.log(a.html);
+            })
+            //$("#feed").append(data);
+            //console.log(data);
           }
         })
       });
