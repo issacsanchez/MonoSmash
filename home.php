@@ -1,13 +1,13 @@
 <?php
-include('./classes/DB.php');
-include('./classes/TESTLOGIN.php');
+include_once('./classes/DB.php');
+include_once('./classes/TESTLOGIN.php');
 session_start();
 
 if (!TESTLOGIN::isLoggedIn()) {
   header("Location: http://localhost/monosmash/login.php?set=1");
 } else {
    $userid = TESTLOGIN::isLoggedIn();
-   //header("Location: http://localhost/monosmash/youtube/ajax/youtube_feed_GET.php");
+   //header("Location: http://localhost/monosmash/facebook/ajax/driver.php");
 }
 ?>
   <!DOCTYPE html>
@@ -64,16 +64,17 @@ if (!TESTLOGIN::isLoggedIn()) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
       crossorigin="anonymous"></script>
     <script>
-     $(document).ready(function () {
+      $(document).ready(function () {
         $.ajax({
           type: "GET",
           dataType: "json",
-          url: "./facebook/ajax/facebook_feed_GET.php",
+          url: "./getfeed.php",
+          //url: "./facebook/ajax/driver.php",
           success: function (data) {
             var predata = '<div class="grid-item">';
             var postdata = '</div>';
             var sorted_data = data.sort(function(a,b) {
-              return new Date(b.created_time.date) - new Date(a.created_time.date);
+              return new Date(b.created_time) - new Date(a.created_time);
             });
             sorted_data.forEach(function(element) {
               element.html = predata + element.html + postdata
@@ -84,28 +85,15 @@ if (!TESTLOGIN::isLoggedIn()) {
             $.each(sorted_data, function(key,val) {
               $("#grid").append(val.html);
             })
+            var tw_script = document.createElement("script");
+            tw_script.setAttribute('src',"https://platform.twitter.com/widgets.js");
+            document.body.appendChild(tw_script);
             var msnry_script = document.createElement("script");
             msnry_script.setAttribute('src','https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js');
             document.body.appendChild(msnry_script);
-            sorted_data.forEach(function(a) {
-              console.log(a.html);
-            })
-            //$("#feed").append(data);
-            //console.log(data);
           }
         })
-      });
-/*      $(document).ready(function () {
-      $.ajax({
-        type: "GET",
-        dataType: "html",
-        url: "./twitter/ajax/twitter_feed_GET.php",
-        success: function (data) {
-          $("#feed").append(data);
-          console.log(data);
-        }
-      })
-    });  */
+      });  
 /*      $(document).ready(function () {
       $.ajax({
         type: "GET",
